@@ -10,7 +10,9 @@
   "dependencies": {
     "ansi-to-html": "^0.7.2",
     "monaco-editor": "^0.38.0",
+    "nodejs-glue": "file:../pseudocode_cie_interpreter/nodejs-glue/pkg",
     "prismjs": "^1.29.0",
+    "vite-plugin-wasm": "^3.2.2",
     "vue": "^3.2.47"
   },
   "devDependencies": {

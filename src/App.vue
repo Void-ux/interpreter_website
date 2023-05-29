@@ -1,5 +1,21 @@
 <script>
 import * as monaco from 'monaco-editor';
+const {interpret} = wasm_bindgen;
+
+
+async function run_wasm() {
+    // Load the wasm file by awaiting the Promise returned by `wasm_bindgen`
+    // `wasm_bindgen` was imported in `index.html`
+    await wasm_bindgen();
+
+    console.log('index.js loaded');
+
+    // Run main WASM entry point
+    // This will create a worker from within our Rust code compiled to WASM
+    interpret('OUTPUT "HI"');
+}
+
+run_wasm();
 
 const EDITOR_DEFAULT = `PROCEDURE CountToN(n: INTEGER)
     DECLARE i: INTEGER
