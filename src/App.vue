@@ -12,6 +12,103 @@ ENDPROCEDURE
 CALL CountToN(10)
 `
 
+monaco.languages.register({ id: 'pseudocode' });
+let keywords = [
+  'AND', 'APPEND', 'ARRAY', 'BOOLEAN', 'BYREF', 'BYVAL', 'CALL', 'CASE OF',
+  'CHAR', 'CLOSEFILE', 'CONSTANT', 'DATE', 'DECLARE', 'DIV', 'ELSE', 'ENDCASE',
+  'ENDFUNCTION', 'ENDIF', 'ENDPROCEDURE', 'ENDTYPE', 'ENDWHILE', 'EOF', 'FALSE',
+  'FOR', 'TO', 'FUNCTION', 'GETRECORD', 'IF', 'INPUT', 'INTEGER', 'LCASE', 'LENGTH',
+  'MID', 'MOD', 'NEXT', 'NOT', 'OPENFILE', 'OR', 'OTHERWISE', 'OUTPUT', 'PROCEDURE',
+  'PUTRECORD', 'READ', 'READFILE', 'REAL', 'REPEAT', 'RETURN', 'RETURNS', 'RIGHT',
+  'RND', 'SEEK', 'STEP', 'STRING', 'THEN', 'TRUE', 'TYPE', 'UCASE', 'UNTIL',
+  'WHILE', 'WRITE', 'WRITEFILE'
+];
+monaco.languages.setLanguageConfiguration('pseudocode', {
+	brackets: [
+		['(', ')']
+	],
+  autoClosingPairs: [
+    { open: '(', close: ')' },
+    { open: '"', close: '"' },
+    { open: 'PROCEDURE', close: 'ENDPROCEDURE' },
+    { open: 'FUNCTION', close: 'ENDFUNCTION'},
+    { open: 'IF', close: 'ENDIF' },
+    { open: 'CASE OF', close: 'ENDCASE' },
+    { open: 'WHILE', close: 'ENDWHILE' }
+  ],
+  surroundingPairs: [
+    { open: '(', close: ')' },
+    { open: '"', close: '"' },
+    { open: 'PROCEDURE', close: 'ENDPROCEDURE' },
+    { open: 'FUNCTION', close: 'ENDFUNCTION'},
+    { open: 'IF', close: 'ENDIF' },
+    { open: 'CASE OF', close: 'ENDCASE' },
+    { open: 'WHILE', close: 'ENDWHILE' }
+  ],
+	onEnterRules: [
+		{
+			beforeText: new RegExp(
+				'^\\s*(?:PROCEDURE|FUNCTION).*?:\\s*$'
+			),
+			action: { indentAction: monaco.languages.IndentAction.Indent }
+		}
+	],
+	folding: {
+		offSide: true,
+		markers: {
+			start: new RegExp('^\\s*#region\\b'),
+			end: new RegExp('^\\s*#endregion\\b')
+		}
+	}
+})
+monaco.languages.setMonarchTokensProvider('pseudocode', {
+  defaultToken: '',
+  keywords: keywords,
+  brackets: [
+    { open: '(', close: ')', token: 'delimiter.parenthesis'}
+  ],
+  operators: ['<-', '+', '-', '*', '/', '>', '<', '>=', '<=', '<>', '=', '&'],
+
+  tokenizer: {
+    root: [
+      { include: '@whitespace' },
+			{ include: '@numbers' },
+			{ include: '@strings' },
+
+			[/@[a-zA-Z_]\w*/, 'tag'],
+			[
+				/[a-zA-Z_]\w*/,
+				{
+					cases: {
+						'@keywords': 'keyword',
+						'@default': 'identifier'
+					}
+				}
+			]
+    ],
+
+		// Deal with white space, including single and multi-line comments
+		whitespace: [
+			[/\s+/, 'white'],
+			[/(^\/\/.*$)/, 'comment'],
+		],
+
+		// Recognize strings, including those broken across lines with \ (but not without)
+		strings: [
+			[/"$/, 'string.escape', '@popall'],
+			[/"/, 'string.escape', '@dblStringBody']
+		],
+		dblStringBody: [
+			[/[^\\"]+$/, 'string', '@popall'],
+			[/[^\\"]+/, 'string'],
+			[/"/, 'string.escape', '@popall'],
+		],
+    numbers: [
+			[/-?(\d*\.)?\d+([eE][+\-]?\d+)?[jJ]?[lL]?/, 'number']
+		],
+  }
+});
+
 function consolify(code) {
   // Prefixes every line with a "> "
   let lines = []
